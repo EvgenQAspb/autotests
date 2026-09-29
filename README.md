@@ -2,6 +2,8 @@
 
 ![tests](badges/tests.svg)
 
+Отчёт последнего прогона: <https://evgenqaspb.github.io/autotests/>
+
 ## Быстрый старт
 
 ```powershell

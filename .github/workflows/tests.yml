@@ -270,6 +270,20 @@ jobs:
         id: deploy
         uses: actions/deploy-pages@v5
 
+      - name: Publish report link
+        if: always()
+        env:
+          REPORT_URL: ${{ steps.deploy.outputs.page_url || steps.pages.outputs.base_url }}
+        run: |
+          [ -z "$REPORT_URL" ] && { echo "URL отчёта неизвестен"; exit 0; }
+          {
+            echo "### Allure report"
+            echo ""
+            echo "[Открыть отчёт]($REPORT_URL)"
+            echo ""
+            echo "Прогон: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          } >> "$GITHUB_STEP_SUMMARY"
+
   quality-gate:
     name: Quality gate
     runs-on: ubuntu-latest
