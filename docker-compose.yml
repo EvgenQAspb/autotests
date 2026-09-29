@@ -1,0 +1,36 @@
+name: autotests
+
+services:
+  mock-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.mock
+    environment:
+      MOCK_NEXT_ID: "101"
+    ports:
+      - "5000:5000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/health')"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # Playwright Server: удалённый запуск браузеров вместо локального Chromium.
+  # Grid из образов Playwright удалён, официальная замена — run-server.
+  playwright-server:
+    image: mcr.microsoft.com/playwright:v1.63.0-noble
+    command: >
+      npx -y playwright@1.63.0 run-server
+      --port 3000
+      --host 0.0.0.0
+    ports:
+      - "3000:3000"
+    ipc: host
+    shm_size: 2gb
+    init: true
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:3000/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
