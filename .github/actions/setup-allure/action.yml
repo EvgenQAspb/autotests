@@ -1,0 +1,40 @@
+name: Setup Allure
+description: Устанавливает Allure CLI (с кэшем) и проверяет версию
+
+inputs:
+  version:
+    description: Версия Allure CLI
+    required: false
+    default: "2.46.1"
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: "17"
+
+    - name: Cache Allure CLI
+      id: allure-cache
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/allure
+        key: allure-${{ inputs.version }}
+
+    - name: Download Allure CLI
+      if: steps.allure-cache.outputs.cache-hit != 'true'
+      shell: bash
+      run: |
+        set -euo pipefail
+        mkdir -p ~/.cache/allure
+        curl -fsSL -o ~/.cache/allure/allure.zip \
+          "https://github.com/allure-framework/allure2/releases/download/${{ inputs.version }}/allure-${{ inputs.version }}.zip"
+        unzip -q -o ~/.cache/allure/allure.zip -d ~/.cache/allure
+
+    - name: Link Allure CLI
+      shell: bash
+      run: |
+        set -euo pipefail
+        sudo ln -sf ~/.cache/allure/allure-${{ inputs.version }}/bin/allure /usr/local/bin/allure
+        allure --version
