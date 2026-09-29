@@ -13,7 +13,7 @@ def add(a, b):
 @allure.story("Сложение")
 @pytest.mark.unit
 def test_add_positive_numbers():
-    assert add(2, 3) == 5
+    assert add(2, 3) == 555
 
 
 @allure.title("Сложение отрицательных чисел")
