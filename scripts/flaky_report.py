@@ -19,7 +19,6 @@ def load_results(results_dir):
             results.append(json.load(f))
     return results
 
-
 def find_flaky(results):
     by_history = collections.defaultdict(list)
     for result in results:
@@ -38,12 +37,16 @@ def main():
     parser = argparse.ArgumentParser(description="Отчёт по flaky-тестам")
     parser.add_argument("--results", default="allure-results", help="папка с результатами Allure")
     parser.add_argument("--max-flaky-percent", type=float, default=20.0, help="допустимый процент flaky")
+    parser.add_argument("--allow-empty", action="store_true", help="не падать, если результатов нет")
     args = parser.parse_args()
 
     results = load_results(args.results)
     if not results:
         print(f"Нет результатов в {args.results}")
-        return 0
+        if args.allow_empty:
+            return 0
+        print("Проверка невозможна: пустой каталог результатов. Это ошибка сборки, а не успех.")
+        return 2
 
     unique = {r.get("historyId") or r.get("uuid") for r in results}
     flaky = find_flaky(results)

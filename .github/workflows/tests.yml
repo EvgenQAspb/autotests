@@ -211,15 +211,19 @@ jobs:
           name: allure-report
           path: history
 
+      # merge-multiple раскладывает содержимое артефактов по artifacts/,
+      # поэтому результаты оказываются в artifacts/allure-results
       - name: Download all Allure results
         uses: actions/download-artifact@v4
         with:
           pattern: allure-results-*
           merge-multiple: true
-          path: allure-results
+          path: artifacts
 
       - name: Build report with history
-        run: allure generate allure-results -o allure-report --clean
+        run: |
+          test -d artifacts/allure-results || { echo "результаты не найдены"; exit 1; }
+          allure generate artifacts/allure-results -o allure-report --clean
 
       - name: Upload report
         uses: actions/upload-artifact@v4
@@ -245,7 +249,7 @@ jobs:
         with:
           pattern: allure-results-*
           merge-multiple: true
-          path: allure-results
+          path: artifacts
 
       - name: Fail if flaky tests exceed threshold
-        run: python scripts/flaky_report.py --results allure-results --max-flaky-percent 20
+        run: python scripts/flaky_report.py --results artifacts/allure-results --max-flaky-percent 20
