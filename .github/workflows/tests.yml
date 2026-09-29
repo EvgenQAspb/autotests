@@ -251,9 +251,6 @@ jobs:
         run: |
           python scripts/merge_history.py --previous previous-report --report allure-report --max-runs 20
 
-      - name: Disable Jekyll processing
-        run: touch allure-report/.nojekyll
-
       - name: Upload report artifact
         uses: actions/upload-artifact@v4
         with:
